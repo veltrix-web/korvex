@@ -1,0 +1,338 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   KRITVYN — design tokens
+   Light, premium, minimal. Lime accent on warm paper white.
+   ============================================================ */
+@theme {
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-hand: 'Caveat', cursive;
+
+  --color-paper: #f7f7f4;
+  --color-paper-2: #ffffff;
+  --color-ink: #0b0b0b;
+  --color-ink-2: #55554f;
+  --color-ink-3: #8a8a82;
+  --color-line: rgba(11, 11, 11, 0.1);
+  --color-line-2: rgba(11, 11, 11, 0.055);
+
+  --color-lime: #a1ff62;
+  --color-lime-2: #8ff03f;
+  /* darkened lime — passes contrast as text/icon on paper */
+  --color-lime-deep: #3f8f14;
+  --color-lime-soft: #edffdd;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis drives scrolling */
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  font-variant-ligatures: common-ligatures;
+}
+
+::selection {
+  background: var(--color-lime);
+  color: var(--color-ink);
+}
+
+/* The native cursor is only hidden once the custom one is actually
+   mounted, so a JS failure never leaves the page without a pointer. */
+.has-custom-cursor,
+.has-custom-cursor a,
+.has-custom-cursor button,
+.has-custom-cursor [data-cursor] {
+  cursor: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(11, 11, 11, 0.18);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(11, 11, 11, 0.32);
+}
+
+/* ============================================================
+   Backgrounds — the signature grid + grain
+   ============================================================ */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, var(--color-line-2) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line-2) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+.bg-grid-fade {
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 35%, #000 20%, transparent 78%);
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 35%, #000 20%, transparent 78%);
+}
+
+.bg-dots {
+  background-image: radial-gradient(var(--color-line) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Soft lime aura used behind hero / CTA */
+.aura {
+  background: radial-gradient(
+    circle at center,
+    rgba(161, 255, 98, 0.55) 0%,
+    rgba(161, 255, 98, 0.22) 35%,
+    transparent 70%
+  );
+  filter: blur(70px);
+}
+
+/* ============================================================
+   Typography helpers
+   ============================================================ */
+.display {
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.hand {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* Lime marker-pen highlight behind text */
+.marker {
+  position: relative;
+  display: inline-block;
+  z-index: 0;
+}
+.marker::before {
+  content: '';
+  position: absolute;
+  left: -0.12em;
+  right: -0.12em;
+  bottom: 0.06em;
+  height: 0.42em;
+  background: var(--color-lime);
+  z-index: -1;
+  transform: skewX(-12deg) scaleX(var(--marker-scale, 1));
+  transform-origin: left;
+  border-radius: 2px;
+}
+
+/* Underline that draws in on hover */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s var(--ease-out-expo);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ============================================================
+   Marquee
+   ============================================================ */
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x var(--marquee-duration, 34s) linear infinite;
+  will-change: transform;
+}
+.marquee-track[data-dir='right'] {
+  animation-direction: reverse;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* ============================================================
+   Misc motion
+   ============================================================ */
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.72);
+  }
+}
+.pulse-dot {
+  animation: pulse-dot 1.9s ease-in-out infinite;
+}
+
+@keyframes sheen {
+  0% {
+    background-position: -180% 0;
+  }
+  100% {
+    background-position: 180% 0;
+  }
+}
+.wordmark-sheen {
+  background: linear-gradient(
+    100deg,
+    var(--color-ink) 40%,
+    var(--color-lime-deep) 50%,
+    var(--color-ink) 60%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 5.5s ease-in-out infinite;
+}
+
+/* Same effect, tuned for the dark footer */
+.wordmark-sheen-dark {
+  background: linear-gradient(
+    100deg,
+    rgba(247, 247, 244, 0.22) 40%,
+    var(--color-lime) 50%,
+    rgba(247, 247, 244, 0.22) 60%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 5.5s ease-in-out infinite;
+}
+
+/* Sweep fill used on service rows + buttons */
+.sweep {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.sweep::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-lime);
+  z-index: -1;
+  transform: translateY(101%);
+  transition: transform 0.62s var(--ease-out-expo);
+}
+.sweep:hover::before {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   Custom cursor
+   ============================================================ */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 999px;
+  will-change: transform;
+}
+
+.cursor-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Accessibility
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}
